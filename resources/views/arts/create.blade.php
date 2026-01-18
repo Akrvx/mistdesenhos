@@ -1,97 +1,124 @@
 @extends('layouts.site')
 
 @section('content')
-<div class="py-12 px-4 flex justify-center items-center min-h-[80vh]">
-    
-    <div class="max-w-2xl w-full">
-        <div class="text-center mb-8">
-            <h1 class="text-4xl font-bold text-white mb-2">Mergulhar Nova Arte</h1>
-            <p class="text-cyan-200">Preencha os detalhes para exibir sua obra no lago.</p>
+    <div class="pt-32 pb-12 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto min-h-screen">
+        
+        <div class="text-center mb-10">
+            <h2 class="text-3xl font-bold text-white mb-2">Publicar Nova Arte</h2>
+            <p class="text-cyan-200">Mostre sua obra prima para o lago.</p>
         </div>
 
-        <div class="glass-card p-8 rounded-3xl border border-white/10 shadow-2xl relative overflow-hidden">
+        <div class="glass-card p-8 rounded-3xl border border-white/10 relative overflow-hidden">
             
-            <div class="absolute -top-20 -right-20 w-64 h-64 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            @if ($errors->any())
+                <div class="mb-6 p-4 rounded-xl bg-red-500/20 border border-red-500/30 text-red-200 text-sm">
+                    <ul class="list-disc list-inside">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
             <form action="{{ route('arts.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6 relative z-10">
                 @csrf
 
-                <div class="space-y-2">
-                    <label class="block text-cyan-100 font-bold mb-1">A Obra (Imagem)</label>
-                    
-                    <div class="relative w-full h-64 border-2 border-dashed border-cyan-400/30 rounded-xl hover:bg-white/5 transition flex flex-col justify-center items-center cursor-pointer group overflow-hidden" id="upload-box">
-                        
-                        <input type="file" name="imagem" id="imagem" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" onchange="previewImage(event)" required>
-                        
-                        <div class="text-center p-4 group-hover:scale-105 transition duration-300" id="placeholder">
-                            <svg class="w-12 h-12 text-cyan-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                            <p class="text-cyan-100 font-semibold">Clique para selecionar</p>
-                            <p class="text-xs text-cyan-200/60">JPG, PNG ou GIF (Max 2MB)</p>
-                        </div>
-
-                        <img id="preview" class="absolute inset-0 w-full h-full object-cover hidden z-10 rounded-xl" />
-                    </div>
-                    @error('imagem') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
+                <div>
+                    <label for="titulo" class="block text-white font-bold mb-2 text-sm">Título da Obra</label>
+                    <input type="text" name="titulo" id="titulo" required
+                        class="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:border-cyan-400 placeholder-white/20 transition"
+                        placeholder="Ex: Pato Cyberpunk 2077">
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label for="titulo" class="block text-cyan-100 font-bold mb-2">Título da Obra</label>
-                        <input type="text" name="titulo" id="titulo" placeholder="Ex: Ocaso Cibernético" 
-                            class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition" required>
-                    </div>
-
-                    <div>
-                        <label for="category" class="block text-cyan-100 font-bold mb-2">Categoria</label>
-                        <select name="category" id="category" 
-                            class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition [&>option]:bg-gray-900">
+                        <label for="category" class="block text-white font-bold mb-2 text-sm">Categoria</label>
+                        <select name="category" id="category" required
+                            class="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:border-cyan-400 transition [&>option]:bg-gray-900">
                             <option value="Digital">Arte Digital</option>
                             <option value="Pintura">Pintura Tradicional</option>
                             <option value="3D">Modelagem 3D</option>
-                            <option value="Fotografia">Fotografia</option>
                             <option value="Pixel Art">Pixel Art</option>
+                            <option value="Fotografia">Fotografia</option>
                             <option value="IA">Inteligência Artificial</option>
                         </select>
                     </div>
-                </div>
 
-                <div>
-                    <label for="preco" class="block text-cyan-100 font-bold mb-2">Valor do Investimento (R$)</label>
-                    <div class="relative">
-                        <span class="absolute left-4 top-3 text-cyan-200 font-bold">R$</span>
-                        <input type="number" name="preco" id="preco" step="0.01" placeholder="0,00" 
-                            class="w-full bg-white/10 border border-white/20 rounded-lg pl-12 pr-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition" required>
+                    <div>
+                        <label for="preco" class="block text-white font-bold mb-2 text-sm">Valor do Investimento</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-3 text-yellow-400 text-lg">🪙</span>
+                            <input type="number" name="preco" id="preco" required min="1" step="1"
+                                class="w-full bg-white/5 border border-white/10 rounded-xl p-3 pl-10 text-white focus:outline-none focus:border-cyan-400 placeholder-white/20 transition"
+                                placeholder="0">
+                        </div>
                     </div>
                 </div>
 
                 <div>
-                    <label for="descricao" class="block text-cyan-100 font-bold mb-2">História da Obra</label>
-                    <textarea name="descricao" id="descricao" rows="4" placeholder="Conte um pouco sobre a inspiração..." 
-                        class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition"></textarea>
+                    <label for="descricao" class="block text-white font-bold mb-2 text-sm">Descrição / História</label>
+                    <textarea name="descricao" id="descricao" rows="4"
+                        class="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:border-cyan-400 placeholder-white/20 transition"
+                        placeholder="Conte sobre o processo criativo, ferramentas usadas..."></textarea>
                 </div>
 
-                <div class="flex items-center justify-end gap-4 pt-4 border-t border-white/10">
-                    <a href="{{ route('dashboard') }}" class="text-cyan-200 hover:text-white transition font-semibold">Cancelar</a>
-                    
-                    <button type="submit" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold py-3 px-8 rounded-full shadow-lg shadow-cyan-500/30 transform hover:-translate-y-1 transition">
-                        Publicar Arte
+                <div>
+                    <label class="block text-white font-bold mb-2 text-sm">Arquivo da Arte</label>
+                    <div class="relative border-2 border-dashed border-white/20 rounded-xl p-8 text-center hover:border-cyan-400/50 transition bg-white/5 group cursor-pointer">
+                        <input type="file" name="imagem" id="imagem" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="previewImage(this)">
+                        
+                        <div id="upload-placeholder">
+                            <div class="text-4xl mb-2 opacity-50 group-hover:scale-110 transition transform">📂</div>
+                            <p class="text-white/60 text-sm font-medium">Arraste ou clique para selecionar</p>
+                            <p class="text-white/30 text-xs mt-1">JPG, PNG ou GIF (Máx. 2MB)</p>
+                        </div>
+                        
+                        <img id="image-preview" class="hidden max-h-64 mx-auto rounded-lg shadow-lg">
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between bg-white/5 p-4 rounded-xl border border-white/10">
+                    <div>
+                        <span class="text-white font-bold text-sm block">Conteúdo Sensível (NSFW)</span>
+                        <span class="text-white/40 text-xs">Marque se a arte contém nudez ou violência.</span>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" name="is_nsfw" value="1" class="sr-only peer">
+                        <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-red-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+                    </label>
+                </div>
+
+                <div class="flex items-center gap-4 pt-4">
+                    <a href="{{ url()->previous() }}" class="px-6 py-3 rounded-xl border border-white/10 text-white hover:bg-white/5 transition font-bold">
+                        Cancelar
+                    </a>
+                    <button type="submit" class="flex-grow bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition transform hover:-translate-y-1">
+                        Publicar Arte 🎨
                     </button>
                 </div>
+
             </form>
         </div>
     </div>
-</div>
 
-<script>
-    function previewImage(event) {
-        const reader = new FileReader();
-        reader.onload = function(){
-            const output = document.getElementById('preview');
-            output.src = reader.result;
-            output.classList.remove('hidden'); // Mostra a imagem
-            document.getElementById('placeholder').classList.add('hidden'); // Esconde o texto
-        };
-        reader.readAsDataURL(event.target.files[0]);
-    }
-</script>
+    <script>
+        function previewImage(input) {
+            const placeholder = document.getElementById('upload-placeholder');
+            const preview = document.getElementById('image-preview');
+            
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.classList.remove('hidden');
+                    placeholder.classList.add('hidden');
+                }
+                
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
 @endsection

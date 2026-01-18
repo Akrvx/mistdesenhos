@@ -45,15 +45,18 @@
                 </div>
             </div>
 
-            <div class="lg:col-span-1 space-y-8">
+            <div class="lg:col-span-1 space-y-8 sticky top-32 h-fit">
                 
-                <div class="glass-card p-8 rounded-3xl border border-white/20 relative overflow-hidden sticky top-32">
+                <div class="glass-card p-8 rounded-3xl border border-white/20 relative overflow-hidden">
                     <div class="absolute top-0 right-0 w-32 h-32 bg-yellow-500/10 rounded-full blur-3xl"></div>
 
                     <p class="text-cyan-200 mb-2 font-semibold">Valor do Investimento</p>
+                    
                     <div class="flex items-center gap-3 mb-8">
-                        <span class="text-4xl">🪙</span>
-                        <span class="text-5xl font-bold text-white">{{ number_format($art->preco, 2, ',', '.') }}</span>
+                        <span class="text-4xl text-yellow-400">🪙</span>
+                        <span class="text-5xl font-bold text-white">
+                            {{ number_format($art->preco, 0, ',', '.') }}
+                        </span>
                     </div>
 
                     @auth
@@ -75,7 +78,7 @@
                             @if(Auth::user()->wallet_balance < $art->preco)
                                 <div class="mt-4 p-3 bg-red-500/20 border border-red-500/30 rounded-lg text-center">
                                     <p class="text-red-200 text-sm mb-2">
-                                        Saldo insuficiente ({{ number_format(Auth::user()->wallet_balance, 2, ',', '.') }})
+                                        Saldo insuficiente (🪙 {{ number_format(Auth::user()->wallet_balance, 0, ',', '.') }})
                                     </p>
                                     <a href="{{ route('wallet.index') }}" class="text-white underline font-bold text-sm hover:text-cyan-300">
                                         Recarregar Carteira

@@ -47,6 +47,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         @foreach($arts as $art)
                             <div class="glass-card overflow-hidden rounded-3xl shadow-2xl border border-white/10 animate-fade-in-up hover:border-cyan-500/30 transition duration-500 flex flex-col h-full">
+                                
                                 <div class="px-5 py-3 flex items-center justify-between bg-white/5 border-b border-white/5">
                                     <div class="flex items-center space-x-2">
                                         <div class="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center font-bold text-white shadow-inner text-xs">
@@ -56,8 +57,10 @@
                                             {{ $art->user->name }}
                                         </a>
                                     </div>
-                                    <span class="bg-cyan-500/10 text-cyan-300 px-2 py-1 rounded-lg text-xs font-bold border border-cyan-500/20">
-                                        R$ {{ number_format($art->preco, 2, ',', '.') }}
+                                    
+                                    <span class="bg-cyan-500/10 text-cyan-300 px-2 py-1 rounded-lg text-xs font-bold border border-cyan-500/20 flex items-center gap-1">
+                                        <span class="text-yellow-400 text-sm">🪙</span> 
+                                        {{ number_format($art->preco, 0, ',', '.') }}
                                     </span>
                                 </div>
 

@@ -39,35 +39,15 @@
                                 {{ $user->commissions_open ? 'checked' : '' }}>
                             
                             <div class="flex items-center justify-between p-4 rounded-xl border transition-all duration-300
-                                {{ $user->commissions_open 
-                                    ? 'bg-green-500/10 border-green-500/30' 
-                                    : 'bg-red-500/10 border-red-500/30' 
-                                }}">
+                                {{ $user->commissions_open ? 'bg-green-500/10 border-green-500/30' : 'bg-red-500/10 border-red-500/30' }}">
                                 
-                                <span class="font-bold flex items-center gap-2 transition-colors
-                                    {{ $user->commissions_open ? 'text-green-400' : 'text-red-400' }}">
-                                    
-                                    <span class="w-2 h-2 rounded-full 
-                                        {{ $user->commissions_open ? 'bg-green-500 animate-pulse' : 'bg-red-500' }}">
-                                    </span>
-                                    
-                                    <span class="status-text">
-                                        {{ $user->commissions_open ? 'Comissões Abertas' : 'Fechado Temporariamente' }}
-                                    </span>
+                                <span class="font-bold flex items-center gap-2 transition-colors {{ $user->commissions_open ? 'text-green-400' : 'text-red-400' }}">
+                                    <span class="w-2 h-2 rounded-full {{ $user->commissions_open ? 'bg-green-500 animate-pulse' : 'bg-red-500' }}"></span>
+                                    <span class="status-text">{{ $user->commissions_open ? 'Comissões Abertas' : 'Fechado Temporariamente' }}</span>
                                 </span>
 
-                                <div class="w-12 h-6 rounded-full relative transition-colors duration-300 border
-                                    {{ $user->commissions_open 
-                                        ? 'bg-green-500/20 border-green-500/50' 
-                                        : 'bg-red-500/20 border-red-500/50' 
-                                    }}">
-                                    
-                                    <div class="absolute top-1 w-4 h-4 rounded-full shadow-lg transition-all duration-300
-                                        {{ $user->commissions_open 
-                                            ? 'right-1 bg-green-500' 
-                                            : 'right-7 bg-red-500' 
-                                        }}">
-                                    </div>
+                                <div class="w-12 h-6 rounded-full relative transition-colors duration-300 border {{ $user->commissions_open ? 'bg-green-500/20 border-green-500/50' : 'bg-red-500/20 border-red-500/50' }}">
+                                    <div class="absolute top-1 w-4 h-4 rounded-full shadow-lg transition-all duration-300 {{ $user->commissions_open ? 'right-1 bg-green-500' : 'right-7 bg-red-500' }}"></div>
                                 </div>
                             </div>
                         </label>
@@ -92,14 +72,8 @@
 
                             @foreach($allTags as $tag)
                                 <label class="cursor-pointer">
-                                    <input type="checkbox" name="specialties[]" value="{{ $tag }}" class="peer sr-only"
-                                        {{ in_array($tag, $myTags) ? 'checked' : '' }}>
-                                    
-                                    <span class="px-3 py-1 rounded-lg border border-white/10 text-xs font-semibold transition select-none inline-block
-                                        bg-white/5 text-cyan-200 
-                                        peer-checked:bg-cyan-500 peer-checked:text-white peer-checked:border-cyan-400">
-                                        {{ $tag }}
-                                    </span>
+                                    <input type="checkbox" name="specialties[]" value="{{ $tag }}" class="peer sr-only" {{ in_array($tag, $myTags) ? 'checked' : '' }}>
+                                    <span class="px-3 py-1 rounded-lg border border-white/10 text-xs font-semibold transition select-none inline-block bg-white/5 text-cyan-200 peer-checked:bg-cyan-500 peer-checked:text-white peer-checked:border-cyan-400">{{ $tag }}</span>
                                 </label>
                             @endforeach
                         </div>
@@ -111,33 +85,25 @@
 
                         <div class="mb-6 border-t border-white/10 pt-4 space-y-3">
                             <label class="block text-white font-bold mb-2 text-sm">Redes Sociais</label>
-                            
                             <div class="flex items-center bg-white/5 border border-white/10 rounded-xl overflow-hidden px-3">
                                 <span class="text-white/40 text-sm font-bold">@</span>
                                 <input type="text" name="twitter" value="{{ old('twitter', $user->twitter) }}" placeholder="Twitter/X" class="w-full bg-transparent border-0 text-white focus:ring-0 text-sm py-3 px-2 placeholder-white/20">
                             </div>
-
                             <div class="flex items-center bg-white/5 border border-white/10 rounded-xl overflow-hidden px-3">
                                 <span class="text-white/40 text-sm font-bold">@</span>
                                 <input type="text" name="instagram" value="{{ old('instagram', $user->instagram) }}" placeholder="Instagram" class="w-full bg-transparent border-0 text-white focus:ring-0 text-sm py-3 px-2 placeholder-white/20">
                             </div>
                         </div>
 
-                        <button type="submit" class="w-full bg-white/10 hover:bg-white/20 text-white font-bold py-2 rounded-xl transition border border-white/20 hover:border-cyan-400/50">
-                            Salvar Perfil
-                        </button>
+                        <button type="submit" class="w-full bg-white/10 hover:bg-white/20 text-white font-bold py-2 rounded-xl transition border border-white/20 hover:border-cyan-400/50">Salvar Perfil</button>
                     </form>
                 </div>
 
                 <div class="glass-card p-6 rounded-3xl border border-white/10">
                     <h3 class="text-xl font-bold text-white mb-4">Adicionar Novo</h3>
                     <div class="space-y-3">
-                        <a href="{{ route('arts.create') }}" class="block w-full text-center py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold shadow-lg transition">
-                            + Produto (Shop)
-                        </a>
-                        <button class="block w-full text-center py-3 rounded-xl bg-pink-500/20 hover:bg-pink-500/30 text-pink-300 border border-pink-500/30 font-bold transition">
-                            + Serviço (Comissão)
-                        </button>
+                        <a href="{{ route('arts.create') }}" class="block w-full text-center py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold shadow-lg transition">+ Produto (Shop)</a>
+                        <button class="block w-full text-center py-3 rounded-xl bg-pink-500/20 hover:bg-pink-500/30 text-pink-300 border border-pink-500/30 font-bold transition">+ Serviço (Comissão)</button>
                     </div>
                 </div>
             </div>
@@ -160,7 +126,9 @@
                                 <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5 hover:border-white/20 transition group">
                                     <div>
                                         <h4 class="text-white font-bold">{{ $comm->title }}</h4>
-                                        <p class="text-cyan-200 text-sm">R$ {{ number_format($comm->price, 2, ',', '.') }} • {{ $comm->days_to_complete }} dias</p>
+                                        <p class="text-cyan-200 text-sm flex items-center gap-1">
+                                            <span class="text-yellow-400">🪙</span> {{ number_format($comm->price, 0, ',', '.') }} • {{ $comm->days_to_complete }} dias
+                                        </p>
                                     </div>
                                     <div class="flex gap-2 opacity-50 group-hover:opacity-100 transition">
                                         <button class="p-2 hover:bg-white/10 rounded-lg text-white" title="Editar">✏️</button>
@@ -196,7 +164,9 @@
                                     
                                     <div class="flex-grow overflow-hidden">
                                         <h4 class="text-white font-bold truncate">{{ $art->titulo }}</h4>
-                                        <p class="text-cyan-200 text-xs">R$ {{ number_format($art->preco, 2, ',', '.') }}</p>
+                                        <p class="text-cyan-200 text-xs flex items-center gap-1">
+                                            <span class="text-yellow-400">🪙</span> {{ number_format($art->preco, 0, ',', '.') }}
+                                        </p>
                                     </div>
 
                                     <div class="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition">
