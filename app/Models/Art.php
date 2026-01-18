@@ -18,11 +18,13 @@ class Art extends Model
         'descricao',
         'preco',
         'imagem_caminho',
-        'user_id'
+        'user_id',
+        'is_nsfw',
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
+    
 }

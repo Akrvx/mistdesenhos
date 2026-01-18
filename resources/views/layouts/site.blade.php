@@ -117,9 +117,14 @@
         <div class="flex items-center space-x-6">
             @if (Route::has('login'))
                 @auth
+                    <a href="{{ route('wallet.index') }}" class="mr-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-full border border-white/10 transition flex items-center gap-2 group">
+                        <span class="text-xl group-hover:scale-110 transition">🪙</span>
+                        <span class="font-bold text-yellow-400">{{ number_format(Auth::user()->wallet_balance, 2, ',', '.') }}</span>
+                    </a>
                     <a href="{{ route('dashboard') }}" class="text-cyan-100 hover:text-white font-semibold transition">
                             Dashboard
                     </a>
+                    
                     <form method="POST" action="{{ route('logout') }}" class="inline">
                         @csrf
                         <button type="submit" class="bg-red-500/10 hover:bg-red-500/30 text-red-200 px-4 py-2 rounded-full font-bold text-sm transition border border-red-500/20">
@@ -140,9 +145,9 @@
         </div>
     </nav>
 
-    <main class="{{ Request::is('/') ? 'w-full' : 'pt-28 pb-20 px-4 container mx-auto' }}">
-        @yield('content')
-    </main>
+   <main class="w-full">
+    @yield('content')
+</main>
 
     <style>
         /* CSS Tremor para quando arrastar */
@@ -181,7 +186,7 @@
             const imgPatoTag = document.getElementById('img-pato-visual');
             
             const gifAndando = "{{ asset('img/pato.gif') }}";
-            const gifArrastando = "{{ asset('img/pato-dragging.gif') }}"; // Mudei para .gif conforme conversamos
+            const gifArrastando = "{{ asset('img/pato-dragging.gif') }}"; 
 
             let isDragging = false;
             let startX, startY, initialLeft, initialTop;
@@ -221,7 +226,7 @@
                 patoContainer.style.transition = "none";
                 patoContainer.style.cursor = "grabbing";
                 imgPatoTag.src = gifArrastando;
-                // imgPatoTag.classList.add('shaking'); // Se o GIF já mexe, pode comentar essa linha
+                
                 imgPatoTag.style.transform = "scaleX(1)"; 
 
                 startX = e.clientX;
