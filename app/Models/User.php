@@ -22,6 +22,11 @@ class User extends Authenticatable
         'email',
         'password',
         'is_artist',
+        'wallet_balance',
+        'reputation',
+        'total_sales',
+        'specialties',
+        'bio',
     ];
 
     /**
@@ -44,6 +49,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_artist' => 'boolean',
+            'specialties' => 'array',
         ];
     }
 

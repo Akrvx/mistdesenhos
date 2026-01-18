@@ -56,6 +56,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Gestão da Vitrine
+    Route::get('/minha-vitrine/editar', [ArtController::class, 'editShowcase'])->name('showcase.edit');
+    Route::post('/minha-vitrine/atualizar', [ArtController::class, 'updateShowcase'])->name('showcase.update');
 });
 
 /*

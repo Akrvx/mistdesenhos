@@ -20,12 +20,19 @@
                     </div>
                 </div>
 
-                <div class="flex gap-4">
+                <div class="flex flex-wrap gap-4 justify-center md:justify-end">
+                    
+                    <a href="{{ route('feed') }}" class="bg-white/5 hover:bg-white/20 text-white font-bold py-3 px-6 rounded-xl border border-white/20 transition flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                        Voltar ao Feed
+                    </a>
+
                     <a href="{{ route('arts.create') }}" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition transform hover:-translate-y-1">
                         + Nova Arte
                     </a>
+                    
                     <a href="{{ route('artist.show', Auth::id()) }}" class="bg-white/10 hover:bg-white/20 text-white font-bold py-3 px-6 rounded-xl border border-white/20 transition">
-                        Ver Meu Perfil
+                        Minha Vitrine
                     </a>
                 </div>
             </div>

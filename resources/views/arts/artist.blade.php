@@ -56,8 +56,8 @@
                                 Seguir
                             </button>
                         @else
-                            <a href="{{ route('dashboard') }}" class="block w-full bg-cyan-600/50 border border-cyan-400/50 text-white font-bold py-3 rounded-xl hover:bg-cyan-600/70 transition">
-                                Editar Perfil
+                            <a href="{{ route('showcase.edit') }}" class="block w-full bg-cyan-600/50 border border-cyan-400/50 text-white font-bold py-3 rounded-xl hover:bg-cyan-600/70 transition shadow-[0_0_15px_rgba(8,145,178,0.3)] flex items-center justify-center gap-2">
+                                ✏️ Editar Vitrine
                             </a>
                         @endif
                     @else
@@ -75,10 +75,15 @@
                 <div class="mt-6">
                     <h4 class="text-white font-bold mb-3 text-sm uppercase tracking-wide opacity-70">Especialidades</h4>
                     <div class="flex flex-wrap gap-2">
-                        <span class="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs text-cyan-200">Illustration</span>
-                        <span class="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs text-cyan-200">Character Design</span>
-                        <span class="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs text-cyan-200">VTuber</span>
-                        <span class="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs text-cyan-200">Live2D</span>
+                        @if(empty($user->specialties))
+                            <p class="text-white/30 text-xs italic">Nenhuma especialidade definida.</p>
+                        @else
+                            @foreach($user->specialties as $tag)
+                                <span class="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs text-cyan-200">
+                                    {{ $tag }}
+                                </span>
+                            @endforeach
+                        @endif
                     </div>
                 </div>
             </div>
@@ -87,13 +92,17 @@
                 
                 <div class="flex items-center gap-6 border-b border-white/10 mb-8 overflow-x-auto pb-1">
                     <button onclick="switchTab('comissoes')" id="btn-comissoes" class="tab-btn text-white font-bold border-b-2 border-cyan-400 pb-3 px-2 transition">
-                        🎨 Comissões (Serviços)
+                        🎨 Comissões
                     </button>
                     <button onclick="switchTab('shop')" id="btn-shop" class="tab-btn text-white/40 hover:text-white font-semibold pb-3 px-2 transition border-b-2 border-transparent">
-                        🛍️ Shop (Pronta Entrega)
+                        🛍️ Shop
                     </button>
-                    <button class="text-white/40 hover:text-white font-semibold pb-3 px-2 transition">Sobre</button>
-                    <button class="text-white/40 hover:text-white font-semibold pb-3 px-2 transition">Reviews ({{ rand(5, 50) }})</button>
+                    <button onclick="switchTab('sobre')" id="btn-sobre" class="tab-btn text-white/40 hover:text-white font-semibold pb-3 px-2 transition border-b-2 border-transparent">
+                        Sobre
+                    </button>
+                    <button onclick="switchTab('reviews')" id="btn-reviews" class="tab-btn text-white/40 hover:text-white font-semibold pb-3 px-2 transition border-b-2 border-transparent">
+                        Reviews ({{ rand(5, 50) }})
+                    </button>
                 </div>
 
                 <div id="tab-comissoes" class="tab-content animate-fade-in-up">
@@ -104,31 +113,23 @@
                     @else
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             @foreach($user->commissions as $comm)
-                                
                                 <div class="glass-card p-6 rounded-2xl border border-white/10 transition duration-300 group cursor-pointer relative overflow-hidden flex flex-col
                                     {{ $comm->is_nsfw ? 'hover:border-red-500/50' : 'hover:border-pink-400/50' }}">
                                     
                                     <div class="absolute top-0 right-0 flex">
                                         @if($comm->is_nsfw)
-                                            <div class="bg-red-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl tracking-wider">
-                                                NSFW 18+
-                                            </div>
+                                            <div class="bg-red-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl tracking-wider">NSFW 18+</div>
                                         @endif
                                         @if(!$comm->is_nsfw && $comm->price < 100)
-                                             <div class="bg-pink-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl tracking-wider">
-                                                POPULAR
-                                            </div>
+                                             <div class="bg-pink-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl tracking-wider">POPULAR</div>
                                         @endif
                                     </div>
                                     
-                                    <h3 class="text-xl font-bold text-white mb-2 transition
-                                        {{ $comm->is_nsfw ? 'group-hover:text-red-400' : 'group-hover:text-pink-300' }}">
+                                    <h3 class="text-xl font-bold text-white mb-2 transition {{ $comm->is_nsfw ? 'group-hover:text-red-400' : 'group-hover:text-pink-300' }}">
                                         {{ $comm->title }}
                                     </h3>
 
-                                    <p class="text-gray-300 text-sm mb-4 line-clamp-2 flex-grow">
-                                        {{ $comm->description }}
-                                    </p>
+                                    <p class="text-gray-300 text-sm mb-4 line-clamp-2 flex-grow">{{ $comm->description }}</p>
                                     <p class="text-xs text-white/40 mb-4 flex items-center gap-1">
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                         Entrega estimada: {{ $comm->days_to_complete }} dias
@@ -139,12 +140,7 @@
                                             <span class="block text-white/40">Valor base</span>
                                             <span class="text-lg font-bold">R$ {{ number_format($comm->price, 2, ',', '.') }}</span>
                                         </div>
-                                        
-                                        <button class="px-4 py-2 rounded-lg font-bold transition border
-                                            {{ $comm->is_nsfw 
-                                                ? 'bg-red-500/20 text-red-300 border-red-500/30 hover:bg-red-600 hover:text-white' 
-                                                : 'bg-pink-500/20 text-pink-300 border-pink-500/30 hover:bg-pink-500 hover:text-white' 
-                                            }}">
+                                        <button class="px-4 py-2 rounded-lg font-bold transition border {{ $comm->is_nsfw ? 'bg-red-500/20 text-red-300 border-red-500/30 hover:bg-red-600 hover:text-white' : 'bg-pink-500/20 text-pink-300 border-pink-500/30 hover:bg-pink-500 hover:text-white' }}">
                                             Solicitar
                                         </button>
                                     </div>
@@ -179,7 +175,6 @@
                                     <div class="p-4 flex flex-col flex-grow">
                                         <h3 class="text-white font-bold truncate mb-1">{{ $art->titulo }}</h3>
                                         <p class="text-cyan-200/60 text-xs mb-4">Pronta Entrega</p>
-                                        
                                         <div class="mt-auto">
                                             <a href="{{ route('arts.show', $art->id) }}" class="block w-full text-center py-2 rounded-lg bg-white/5 hover:bg-white/20 text-white text-sm font-semibold transition border border-white/5">
                                                 Ver Detalhes
@@ -192,28 +187,106 @@
                     @endif
                 </div>
 
+                <div id="tab-sobre" class="tab-content hidden animate-fade-in-up">
+                    <div class="glass-card p-8 rounded-3xl border border-white/10">
+                        <h3 class="text-2xl font-bold text-white mb-6">Sobre o Artista</h3>
+                        
+                        @if($user->bio)
+                            <div class="prose prose-invert max-w-none text-gray-300 leading-relaxed whitespace-pre-line">
+                                {{ $user->bio }}
+                            </div>
+                        @else
+                            <div class="text-center py-10 border border-dashed border-white/10 rounded-xl">
+                                <p class="text-white/40 italic">O artista ainda não escreveu uma biografia.</p>
+                            </div>
+                        @endif
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 pt-8 border-t border-white/10">
+                            <div>
+                                <span class="block text-cyan-400 text-xs font-bold uppercase">Membro desde</span>
+                                <span class="text-white">{{ $user->created_at->format('M, Y') }}</span>
+                            </div>
+                            <div>
+                                <span class="block text-cyan-400 text-xs font-bold uppercase">Tempo Médio de Resposta</span>
+                                <span class="text-white">~4 horas</span>
+                            </div>
+                            <div>
+                                <span class="block text-cyan-400 text-xs font-bold uppercase">Idiomas</span>
+                                <span class="text-white">Português, English</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-reviews" class="tab-content hidden animate-fade-in-up">
+                    <div class="glass-card p-8 rounded-3xl border border-white/10">
+                        <div class="flex items-center justify-between mb-8">
+                            <h3 class="text-2xl font-bold text-white">Avaliações Recentes</h3>
+                            <div class="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-lg">
+                                <span class="text-yellow-400 text-xl">★</span>
+                                <span class="text-white font-bold text-xl">5.0</span>
+                                <span class="text-white/40 text-sm">(Baseado em vendas recentes)</span>
+                            </div>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div class="border-b border-white/5 pb-6">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-300 font-bold">M</div>
+                                        <div>
+                                            <h4 class="text-white font-bold text-sm">MoonWatcher</h4>
+                                            <p class="text-white/30 text-xs">Comprou "Ilustração Full Body"</p>
+                                        </div>
+                                    </div>
+                                    <span class="text-yellow-400 text-sm">★★★★★</span>
+                                </div>
+                                <p class="text-gray-300 text-sm">O trabalho ficou incrível! Exatamente como eu imaginei.</p>
+                                <p class="text-white/20 text-xs mt-2">Postado há 2 dias</p>
+                            </div>
+
+                            <div class="border-b border-white/5 pb-6">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-300 font-bold">K</div>
+                                        <div>
+                                            <h4 class="text-white font-bold text-sm">Kai_Zero</h4>
+                                            <p class="text-white/30 text-xs">Comprou "Pack de Emotes"</p>
+                                        </div>
+                                    </div>
+                                    <span class="text-yellow-400 text-sm">★★★★★</span>
+                                </div>
+                                <p class="text-gray-300 text-sm">Entrega super rápida e qualidade absurda. Recomendo demais!</p>
+                                <p class="text-white/20 text-xs mt-2">Postado há 1 semana</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
 
     <script>
         function switchTab(tabName) {
-            // 1. Esconde todos os conteúdos
+            // Esconde todas as abas
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             
-            // 2. Tira o estilo "ativo" de todos os botões
+            // Remove destaque dos botões
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.remove('border-cyan-400', 'text-white');
                 btn.classList.add('border-transparent', 'text-white/40');
             });
 
-            // 3. Mostra o conteúdo certo
-            document.getElementById('tab-' + tabName).classList.remove('hidden');
-            
-            // 4. Ativa o botão certo
+            // Mostra a aba certa e destaca o botão
+            const content = document.getElementById('tab-' + tabName);
             const btn = document.getElementById('btn-' + tabName);
-            btn.classList.remove('border-transparent', 'text-white/40');
-            btn.classList.add('border-cyan-400', 'text-white');
+            
+            if(content && btn) {
+                content.classList.remove('hidden');
+                btn.classList.remove('border-transparent', 'text-white/40');
+                btn.classList.add('border-cyan-400', 'text-white');
+            }
         }
     </script>
 

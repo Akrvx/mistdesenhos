@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Commission;
 
 class ArtController extends Controller
 {
@@ -93,4 +94,34 @@ class ArtController extends Controller
         // Retorna tudo para a View
         return view('feed', compact('arts', 'topSellers', 'topRated'));
     }
+
+    public function editShowcase()
+    {
+        $user = Auth::user();
+        
+        // Busca os produtos e serviços DO USUÁRIO LOGADO para ele editar
+        $arts = Art::where('user_id', $user->id)->latest()->get();
+        $commissions = Commission::where('user_id', $user->id)->get();
+
+        return view('arts.edit_showcase', compact('user', 'arts', 'commissions'));
+    }
+
+    // Adicione isso no final da classe ArtController
+public function updateShowcase(Request $request)
+{
+    $request->validate([
+        'specialties' => 'array', // Garante que é uma lista
+        'specialties.*' => 'string', // Garante que cada item é texto
+        'bio' => 'nullable|string|max:1000', // Validação da bio
+    ]);
+
+    $user = Auth::user();
+    
+    // Salva as especialidades (se vier vazio, salva null)
+    $user->specialties = $request->input('specialties', []);
+    $user->bio = $request->input('bio'); // Salva a bio
+    $user->save();
+
+    return redirect()->route('showcase.edit')->with('success', 'Vitrine atualizada com sucesso!');
+}
 }
