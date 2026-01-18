@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Art;
 use App\Models\User;
+use App\Models\Commission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use App\Models\Commission;
 
 class ArtController extends Controller
 {
@@ -20,10 +20,10 @@ class ArtController extends Controller
     // 2. Salvar a Arte no Banco de Dados (POST /vender)
     public function store(Request $request)
     {
-        // Validação dos dados (Adicionei a categoria aqui!)
+        // Validação dos dados
         $request->validate([
             'titulo' => 'required|string|max:255',
-            'category' => 'required|string', // --- CORREÇÃO AQUI ---
+            'category' => 'required|string',
             'descricao' => 'nullable|string',
             'preco' => 'required|numeric|min:0',
             'imagem' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Max 2MB
@@ -40,13 +40,13 @@ class ArtController extends Controller
         Art::create([
             'user_id' => Auth::id(), // Pega o ID do usuário logado
             'titulo' => $request->titulo,
-            'category' => $request->category, // --- CORREÇÃO AQUI (Salvando no banco) ---
+            'category' => $request->category,
             'descricao' => $request->descricao,
             'preco' => $request->preco,
             'imagem_caminho' => $path, 
         ]);
 
-        // Redireciona para o Dashboard (Onde ele vê as próprias obras)
+        // Redireciona para o Dashboard
         return redirect()->route('dashboard')->with('success', 'Sua arte foi mergulhada no lago com sucesso!');
     }
 
@@ -71,7 +71,7 @@ class ArtController extends Controller
     // 5. Função do FEED (Estilo Blog/Timeline)
     public function feed(Request $request)
     {
-        // 1. Busca as Artes (Filtro normal que já fizemos)
+        // 1. Busca as Artes (Filtro)
         $query = Art::with('user');
 
         if ($request->has('categoria') && $request->categoria != 'todas') {
@@ -95,6 +95,7 @@ class ArtController extends Controller
         return view('feed', compact('arts', 'topSellers', 'topRated'));
     }
 
+    // 6. Tela de Edição da Vitrine
     public function editShowcase()
     {
         $user = Auth::user();
@@ -106,22 +107,45 @@ class ArtController extends Controller
         return view('arts.edit_showcase', compact('user', 'arts', 'commissions'));
     }
 
-    // Adicione isso no final da classe ArtController
-public function updateShowcase(Request $request)
-{
-    $request->validate([
-        'specialties' => 'array', // Garante que é uma lista
-        'specialties.*' => 'string', // Garante que cada item é texto
-        'bio' => 'nullable|string|max:1000', // Validação da bio
-    ]);
+    // 7. Atualizar a Vitrine (Status, Bio, Tags, Social)
+    public function updateShowcase(Request $request)
+    {
+        $user = Auth::user();
 
-    $user = Auth::user();
-    
-    // Salva as especialidades (se vier vazio, salva null)
-    $user->specialties = $request->input('specialties', []);
-    $user->bio = $request->input('bio'); // Salva a bio
-    $user->save();
+        // CENÁRIO A: O usuário clicou no botão de STATUS (Aberto/Fechado)
+        if ($request->input('form_type') === 'status') {
+            // O checkbox só envia valor se estiver marcado. 
+            // has('commissions_open') retorna true se marcado, false se não.
+            $user->commissions_open = $request->has('commissions_open');
+            $user->save();
+            
+            $status = $user->commissions_open ? 'abertas' : 'fechadas';
+            return redirect()->back()->with('success', "Agenda $status com sucesso!");
+        }
 
-    return redirect()->route('showcase.edit')->with('success', 'Vitrine atualizada com sucesso!');
-}
+        // CENÁRIO B: O usuário salvou o PERFIL (Bio, Tags, Social)
+        // (Verificamos se é 'profile' ou se não tem tipo, pra garantir)
+        if ($request->input('form_type') === 'profile' || !$request->has('form_type')) {
+            $request->validate([
+                'specialties' => 'array',
+                'specialties.*' => 'string',
+                'bio' => 'nullable|string|max:1000',
+                'twitter' => 'nullable|string|max:255',
+                'instagram' => 'nullable|string|max:255',
+            ]);
+
+            $user->specialties = $request->input('specialties', []);
+            $user->bio = $request->input('bio');
+            
+            // Limpa o @ se o usuário digitar
+            $user->twitter = str_replace('@', '', $request->input('twitter'));
+            $user->instagram = str_replace('@', '', $request->input('instagram'));
+            
+            $user->save();
+            
+            return redirect()->route('showcase.edit')->with('success', 'Perfil atualizado com sucesso!');
+        }
+
+        return redirect()->back();
+    }
 }

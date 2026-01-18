@@ -29,17 +29,51 @@
                 <div class="glass-card p-6 rounded-3xl border border-white/10">
                     <h3 class="text-xl font-bold text-white mb-4">Status da Loja</h3>
                     
-                    <div class="flex items-center justify-between bg-white/5 p-4 rounded-xl border border-white/5 mb-4">
-                        <span class="text-green-400 font-bold flex items-center gap-2">
-                            <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                            Comissões Abertas
-                        </span>
-                        <div class="w-12 h-6 bg-green-500/20 rounded-full relative cursor-pointer border border-green-500/50">
-                            <div class="absolute right-1 top-1 w-4 h-4 bg-green-500 rounded-full shadow-lg"></div>
-                        </div>
-                    </div>
+                    <form action="{{ route('showcase.update') }}" method="POST" id="status-form">
+                        @csrf
+                        <input type="hidden" name="form_type" value="status">
+
+                        <label class="cursor-pointer group block">
+                            <input type="checkbox" name="commissions_open" value="1" class="sr-only" 
+                                onchange="document.getElementById('status-form').submit()"
+                                {{ $user->commissions_open ? 'checked' : '' }}>
+                            
+                            <div class="flex items-center justify-between p-4 rounded-xl border transition-all duration-300
+                                {{ $user->commissions_open 
+                                    ? 'bg-green-500/10 border-green-500/30' 
+                                    : 'bg-red-500/10 border-red-500/30' 
+                                }}">
+                                
+                                <span class="font-bold flex items-center gap-2 transition-colors
+                                    {{ $user->commissions_open ? 'text-green-400' : 'text-red-400' }}">
+                                    
+                                    <span class="w-2 h-2 rounded-full 
+                                        {{ $user->commissions_open ? 'bg-green-500 animate-pulse' : 'bg-red-500' }}">
+                                    </span>
+                                    
+                                    <span class="status-text">
+                                        {{ $user->commissions_open ? 'Comissões Abertas' : 'Fechado Temporariamente' }}
+                                    </span>
+                                </span>
+
+                                <div class="w-12 h-6 rounded-full relative transition-colors duration-300 border
+                                    {{ $user->commissions_open 
+                                        ? 'bg-green-500/20 border-green-500/50' 
+                                        : 'bg-red-500/20 border-red-500/50' 
+                                    }}">
+                                    
+                                    <div class="absolute top-1 w-4 h-4 rounded-full shadow-lg transition-all duration-300
+                                        {{ $user->commissions_open 
+                                            ? 'right-1 bg-green-500' 
+                                            : 'right-7 bg-red-500' 
+                                        }}">
+                                    </div>
+                                </div>
+                            </div>
+                        </label>
+                    </form>
                     
-                    <p class="text-xs text-white/40 text-center">Clique para fechar temporariamente sua agenda.</p>
+                    <p class="text-xs text-white/40 text-center mt-4">Clique para alternar o status.</p>
                 </div>
 
                 <div class="glass-card p-6 rounded-3xl border border-white/10">
@@ -48,11 +82,11 @@
                     
                     <form action="{{ route('showcase.update') }}" method="POST">
                         @csrf
+                        <input type="hidden" name="form_type" value="profile">
                         
                         <div class="flex flex-wrap gap-2 mb-6">
                             @php
                                 $allTags = ['Ilustração 2D', 'Modelagem 3D', 'Pixel Art', 'VTuber', 'Live2D', 'Rigging', 'Emotes', 'Concept Art', 'Animação', 'Design Gráfico'];
-                                // Pega as especialidades do usuário (ou array vazio se não tiver)
                                 $myTags = $user->specialties ?? [];
                             @endphp
 
@@ -72,16 +106,25 @@
 
                         <div class="mb-6 border-t border-white/10 pt-4">
                             <label class="block text-white font-bold mb-2 text-sm">Sobre Mim (Bio)</label>
-                            <textarea 
-                                name="bio" 
-                                rows="5" 
-                                class="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:border-cyan-400 placeholder-white/20 text-sm"
-                                placeholder="Conte um pouco sobre sua experiência, ferramentas que usa e o que gosta de desenhar..."
-                            >{{ old('bio', $user->bio) }}</textarea>
+                            <textarea name="bio" rows="5" class="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:border-cyan-400 placeholder-white/20 text-sm">{{ old('bio', $user->bio) }}</textarea>
+                        </div>
+
+                        <div class="mb-6 border-t border-white/10 pt-4 space-y-3">
+                            <label class="block text-white font-bold mb-2 text-sm">Redes Sociais</label>
+                            
+                            <div class="flex items-center bg-white/5 border border-white/10 rounded-xl overflow-hidden px-3">
+                                <span class="text-white/40 text-sm font-bold">@</span>
+                                <input type="text" name="twitter" value="{{ old('twitter', $user->twitter) }}" placeholder="Twitter/X" class="w-full bg-transparent border-0 text-white focus:ring-0 text-sm py-3 px-2 placeholder-white/20">
+                            </div>
+
+                            <div class="flex items-center bg-white/5 border border-white/10 rounded-xl overflow-hidden px-3">
+                                <span class="text-white/40 text-sm font-bold">@</span>
+                                <input type="text" name="instagram" value="{{ old('instagram', $user->instagram) }}" placeholder="Instagram" class="w-full bg-transparent border-0 text-white focus:ring-0 text-sm py-3 px-2 placeholder-white/20">
+                            </div>
                         </div>
 
                         <button type="submit" class="w-full bg-white/10 hover:bg-white/20 text-white font-bold py-2 rounded-xl transition border border-white/20 hover:border-cyan-400/50">
-                            Salvar Alterações
+                            Salvar Perfil
                         </button>
                     </form>
                 </div>

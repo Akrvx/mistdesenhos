@@ -27,6 +27,9 @@ class User extends Authenticatable
         'total_sales',
         'specialties',
         'bio',
+        'twitter',
+        'instagram',
+        'commissions_open',
     ];
 
     /**
@@ -51,6 +54,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_artist' => 'boolean',
             'specialties' => 'array',
+            'commissions_open' => 'boolean',
         ];
     }
 
