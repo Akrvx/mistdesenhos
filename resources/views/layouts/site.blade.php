@@ -109,7 +109,7 @@
         <div class="bubble"></div>
     </div>
 
-    <nav class="glass-card fixed top-4 left-4 right-4 z-50 px-6 py-4 flex justify-between items-center transition-all duration-300">
+   <nav class="glass-card fixed top-4 left-4 right-4 z-50 px-6 py-4 flex justify-between items-center transition-all duration-300">
         <a href="/" class="text-2xl font-bold tracking-widest text-cyan-100 hover:text-white transition">
             Duck<span class="text-white">ly</span>
         </a>
@@ -117,12 +117,27 @@
         <div class="flex items-center space-x-6">
             @if (Route::has('login'))
                 @auth
+                    <a href="{{ route('commissions.index') }}" class="text-cyan-100 hover:text-white font-semibold transition flex items-center gap-2 group relative">
+                        <span>🎨</span>
+                        <span class="hidden md:inline">Encomendas</span>
+                        
+                        @php
+                            $pendingCount = \App\Models\Commission::where('artist_id', Auth::id())->where('status', 'pending')->count();
+                        @endphp
+                        @if($pendingCount > 0)
+                            <span class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full animate-pulse">
+                                {{ $pendingCount }}
+                            </span>
+                        @endif
+                    </a>
+
                     <a href="{{ route('wallet.index') }}" class="mr-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-full border border-white/10 transition flex items-center gap-2 group">
                         <span class="text-xl group-hover:scale-110 transition">🪙</span>
                         <span class="font-bold text-yellow-400">{{ number_format(Auth::user()->wallet_balance, 2, ',', '.') }}</span>
                     </a>
+
                     <a href="{{ route('dashboard') }}" class="text-cyan-100 hover:text-white font-semibold transition">
-                            Dashboard
+                        Dashboard
                     </a>
                     
                     <form method="POST" action="{{ route('logout') }}" class="inline">

@@ -77,9 +77,15 @@
                             </div>
 
                         @else
-                            <a href="{{ route('showcase.edit') }}" class="block w-full bg-cyan-600/50 border border-cyan-400/50 text-white font-bold py-3 rounded-xl hover:bg-cyan-600/70 transition shadow-[0_0_15px_rgba(8,145,178,0.3)] flex items-center justify-center gap-2">
-                                Editar Vitrine
-                            </a>
+                            @if($user->is_artist)
+                                <a href="{{ route('showcase.edit') }}" class="block w-full bg-cyan-600/50 border border-cyan-400/50 text-white font-bold py-3 rounded-xl hover:bg-cyan-600/70 transition shadow-[0_0_15px_rgba(8,145,178,0.3)] flex items-center justify-center gap-2">
+                                    Editar Vitrine
+                                </a>
+                            @else
+                                <div class="text-center py-2 border border-white/10 rounded-xl bg-white/5">
+                                    <p class="text-slate-400 text-xs">Conta de Usuário Comum</p>
+                                </div>
+                            @endif
                         @endif
                     @else
                         <a href="{{ route('login') }}" class="block w-full bg-white text-blue-900 font-bold py-3 rounded-xl hover:bg-cyan-50 transition shadow-lg">
