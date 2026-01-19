@@ -8,38 +8,30 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // 1. Cria a tabela de comissões
+        // Cria a tabela de PEDIDOS DE ENCOMENDA
         Schema::create('commissions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             
-            $table->string('title');
+            // Quem pediu (Cliente)
+            $table->foreignId('client_id')->constrained('users')->onDelete('cascade');
+            
+            // Quem vai desenhar (Artista)
+            $table->foreignId('artist_id')->constrained('users')->onDelete('cascade');
+            
+            // Detalhes do pedido
             $table->text('description');
-            $table->decimal('price', 10, 2);
-            $table->integer('days_to_complete')->default(7);
+            $table->decimal('price', 10, 2)->nullable(); // O Artista define depois
+            $table->string('status')->default('pending'); // pending, accepted, rejected, completed
             
-            $table->boolean('is_nsfw')->default(false);
+            // Prazo (Opcional)
+            $table->date('prazo_desejado')->nullable();
             
             $table->timestamps();
         });
-
-        // 2. Adiciona a coluna is_nsfw na tabela de artes (se ainda não existir)
-        // Usamos hasColumn para evitar erros se você rodar migrate:refresh várias vezes
-        if (!Schema::hasColumn('arts', 'is_nsfw')) {
-            Schema::table('arts', function (Blueprint $table) {
-                $table->boolean('is_nsfw')->default(false)->after('category');
-            });
-        }
     }
 
     public function down(): void
     {
         Schema::dropIfExists('commissions');
-        
-        if (Schema::hasColumn('arts', 'is_nsfw')) {
-            Schema::table('arts', function (Blueprint $table) {
-                $table->dropColumn('is_nsfw');
-            });
-        }
     }
 };

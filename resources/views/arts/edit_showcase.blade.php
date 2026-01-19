@@ -13,7 +13,7 @@
         <div class="flex flex-col md:flex-row justify-between items-end mb-10 gap-6">
             <div>
                 <h2 class="text-3xl font-bold text-white mb-2">Gerenciar Vitrine</h2>
-                <p class="text-cyan-200">Adicione, remova ou edite o que aparece na sua página pública.</p>
+                <p class="text-cyan-200">Personalize seu perfil e gerencie sua loja de produtos prontos.</p>
             </div>
             
             <a href="{{ route('artist.show', Auth::id()) }}" class="bg-white/10 hover:bg-white/20 text-white font-bold py-2 px-6 rounded-xl border border-white/20 transition flex items-center gap-2">
@@ -27,7 +27,7 @@
             <div class="space-y-8">
                 
                 <div class="glass-card p-6 rounded-3xl border border-white/10">
-                    <h3 class="text-xl font-bold text-white mb-4">Status da Loja</h3>
+                    <h3 class="text-xl font-bold text-white mb-4">Agenda de Encomendas</h3>
                     
                     <form action="{{ route('showcase.update') }}" method="POST" id="status-form">
                         @csrf
@@ -43,7 +43,7 @@
                                 
                                 <span class="font-bold flex items-center gap-2 transition-colors {{ $user->commissions_open ? 'text-green-400' : 'text-red-400' }}">
                                     <span class="w-2 h-2 rounded-full {{ $user->commissions_open ? 'bg-green-500 animate-pulse' : 'bg-red-500' }}"></span>
-                                    <span class="status-text">{{ $user->commissions_open ? 'Comissões Abertas' : 'Fechado Temporariamente' }}</span>
+                                    <span class="status-text">{{ $user->commissions_open ? 'Aberto para Pedidos' : 'Fechado Temporariamente' }}</span>
                                 </span>
 
                                 <div class="w-12 h-6 rounded-full relative transition-colors duration-300 border {{ $user->commissions_open ? 'bg-green-500/20 border-green-500/50' : 'bg-red-500/20 border-red-500/50' }}">
@@ -53,7 +53,7 @@
                         </label>
                     </form>
                     
-                    <p class="text-xs text-white/40 text-center mt-4">Clique para alternar o status.</p>
+                    <p class="text-xs text-white/40 text-center mt-4">Quando ativo, o botão "Pedir Encomenda" aparece no seu perfil.</p>
                 </div>
 
                 <div class="glass-card p-6 rounded-3xl border border-white/10">
@@ -100,11 +100,11 @@
                 </div>
 
                 <div class="glass-card p-6 rounded-3xl border border-white/10">
-                    <h3 class="text-xl font-bold text-white mb-4">Adicionar Novo</h3>
-                    <div class="space-y-3">
-                        <a href="{{ route('arts.create') }}" class="block w-full text-center py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold shadow-lg transition">+ Produto (Shop)</a>
-                        <button class="block w-full text-center py-3 rounded-xl bg-pink-500/20 hover:bg-pink-500/30 text-pink-300 border border-pink-500/30 font-bold transition">+ Serviço (Comissão)</button>
-                    </div>
+                    <h3 class="text-xl font-bold text-white mb-4">Adicionar Produto</h3>
+                    <a href="{{ route('arts.create') }}" class="block w-full text-center py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold shadow-lg transition">
+                        + Publicar Arte na Loja
+                    </a>
+                    <p class="text-xs text-white/40 text-center mt-3">Para vender desenhos prontos, wallpapers, packs, etc.</p>
                 </div>
             </div>
 
@@ -112,37 +112,7 @@
                 
                 <div class="glass-card p-8 rounded-3xl border border-white/10">
                     <h3 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                        🎨 Meus Serviços Ativos
-                        <span class="text-sm bg-white/10 text-white/60 px-2 py-1 rounded-lg">{{ $commissions->count() }}</span>
-                    </h3>
-
-                    @if($commissions->isEmpty())
-                        <div class="text-center py-10 border border-dashed border-white/10 rounded-xl">
-                            <p class="text-white/40">Você não oferece nenhum serviço ainda.</p>
-                        </div>
-                    @else
-                        <div class="space-y-4">
-                            @foreach($commissions as $comm)
-                                <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5 hover:border-white/20 transition group">
-                                    <div>
-                                        <h4 class="text-white font-bold">{{ $comm->title }}</h4>
-                                        <p class="text-cyan-200 text-sm flex items-center gap-1">
-                                            <span class="text-yellow-400">🪙</span> {{ number_format($comm->price, 0, ',', '.') }} • {{ $comm->days_to_complete }} dias
-                                        </p>
-                                    </div>
-                                    <div class="flex gap-2 opacity-50 group-hover:opacity-100 transition">
-                                        <button class="p-2 hover:bg-white/10 rounded-lg text-white" title="Editar">✏️</button>
-                                        <button class="p-2 hover:bg-red-500/20 rounded-lg text-red-400" title="Excluir">🗑️</button>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    @endif
-                </div>
-
-                <div class="glass-card p-8 rounded-3xl border border-white/10">
-                    <h3 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                        🛍️ Meus Produtos (Galeria)
+                        🛍️ Meus Produtos (Shop)
                         <span class="text-sm bg-white/10 text-white/60 px-2 py-1 rounded-lg">{{ $arts->count() }}</span>
                     </h3>
 

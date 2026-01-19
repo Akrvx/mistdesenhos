@@ -56,15 +56,29 @@
 
                     @auth
                         @if(Auth::id() !== $user->id)
-                            <button class="w-full bg-white text-blue-900 font-bold py-3 rounded-xl hover:bg-cyan-50 transition shadow-lg mb-3">
-                                Mensagem Direta
-                            </button>
-                            <button class="w-full bg-white/5 border border-white/10 text-white font-semibold py-2 rounded-xl hover:bg-white/10 transition text-sm">
-                                Seguir
-                            </button>
+                            
+                            @if($user->commissions_open)
+                                <a href="{{ route('commissions.create', $user->id) }}" class="block w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-bold py-3 rounded-xl shadow-[0_0_15px_rgba(147,51,234,0.4)] transition transform hover:scale-105 mb-3 flex items-center justify-center gap-2">
+                                    <span>✨</span> Pedir Encomenda
+                                </a>
+                            @else
+                                <button disabled class="w-full bg-slate-700 text-slate-400 font-bold py-3 rounded-xl cursor-not-allowed opacity-50 mb-3 border border-white/5">
+                                    🚫 Agenda Fechada
+                                </button>
+                            @endif
+
+                            <div class="grid grid-cols-2 gap-2">
+                                <button class="bg-white/5 border border-white/10 text-white font-semibold py-2 rounded-xl hover:bg-white/10 transition text-sm">
+                                    Mensagem
+                                </button>
+                                <button class="bg-white/5 border border-white/10 text-white font-semibold py-2 rounded-xl hover:bg-white/10 transition text-sm">
+                                    Seguir
+                                </button>
+                            </div>
+
                         @else
                             <a href="{{ route('showcase.edit') }}" class="block w-full bg-cyan-600/50 border border-cyan-400/50 text-white font-bold py-3 rounded-xl hover:bg-cyan-600/70 transition shadow-[0_0_15px_rgba(8,145,178,0.3)] flex items-center justify-center gap-2">
-                                ✏️ Editar Vitrine
+                                Editar Vitrine
                             </a>
                         @endif
                     @else
@@ -98,43 +112,14 @@
             </div>
 
             <div class="flex-1 min-w-0">
+                
                 <div class="flex items-center gap-6 border-b border-white/10 mb-8 overflow-x-auto pb-1">
-                    <button onclick="switchTab('comissoes')" id="btn-comissoes" class="tab-btn text-white font-bold border-b-2 border-cyan-400 pb-3 px-2 transition">🎨 Comissões</button>
-                    <button onclick="switchTab('shop')" id="btn-shop" class="tab-btn text-white/40 hover:text-white font-semibold pb-3 px-2 transition border-b-2 border-transparent">🛍️ Shop</button>
+                    <button onclick="switchTab('shop')" id="btn-shop" class="tab-btn text-white font-bold border-b-2 border-cyan-400 pb-3 px-2 transition">🛍️ Shop (Vitrine)</button>
                     <button onclick="switchTab('sobre')" id="btn-sobre" class="tab-btn text-white/40 hover:text-white font-semibold pb-3 px-2 transition border-b-2 border-transparent">Sobre</button>
                     <button onclick="switchTab('reviews')" id="btn-reviews" class="tab-btn text-white/40 hover:text-white font-semibold pb-3 px-2 transition border-b-2 border-transparent">Reviews ({{ rand(5, 50) }})</button>
                 </div>
 
-                <div id="tab-comissoes" class="tab-content animate-fade-in-up">
-                    @if($user->commissions->isEmpty())
-                        <div class="glass-card p-12 text-center border-dashed border-2 border-white/10 rounded-3xl"><p class="text-white/60">Este artista ainda não abriu comissões.</p></div>
-                    @else
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            @foreach($user->commissions as $comm)
-                                <div class="glass-card p-6 rounded-2xl border border-white/10 transition duration-300 group cursor-pointer relative overflow-hidden flex flex-col {{ $comm->is_nsfw ? 'hover:border-red-500/50' : 'hover:border-pink-400/50' }}">
-                                    <div class="absolute top-0 right-0 flex">
-                                        @if($comm->is_nsfw)<div class="bg-red-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl tracking-wider">NSFW 18+</div>@endif
-                                        @if(!$comm->is_nsfw && $comm->price < 100)<div class="bg-pink-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl tracking-wider">POPULAR</div>@endif
-                                    </div>
-                                    <h3 class="text-xl font-bold text-white mb-2 transition {{ $comm->is_nsfw ? 'group-hover:text-red-400' : 'group-hover:text-pink-300' }}">{{ $comm->title }}</h3>
-                                    <p class="text-gray-300 text-sm mb-4 line-clamp-2 flex-grow">{{ $comm->description }}</p>
-                                    <p class="text-xs text-white/40 mb-4 flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Entrega estimada: {{ $comm->days_to_complete }} dias</p>
-                                    <div class="flex items-center justify-between mt-4 pt-4 border-t border-white/5">
-                                        <div class="text-xs text-cyan-200">
-                                            <span class="block text-white/40">Valor base</span>
-                                            <span class="text-lg font-bold flex items-center gap-1">
-                                                <span class="text-yellow-400">🪙</span> {{ number_format($comm->price, 0, ',', '.') }}
-                                            </span>
-                                        </div>
-                                        <button class="px-4 py-2 rounded-lg font-bold transition border {{ $comm->is_nsfw ? 'bg-red-500/20 text-red-300 border-red-500/30 hover:bg-red-600 hover:text-white' : 'bg-pink-500/20 text-pink-300 border-pink-500/30 hover:bg-pink-500 hover:text-white' }}">Solicitar</button>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    @endif
-                </div>
-
-                <div id="tab-shop" class="tab-content hidden animate-fade-in-up">
+                <div id="tab-shop" class="tab-content animate-fade-in-up">
                     @if($arts->isEmpty())
                         <div class="glass-card p-12 text-center border-dashed border-2 border-white/10 rounded-3xl"><p class="text-white/60">Este artista ainda não publicou produtos na loja.</p></div>
                     @else

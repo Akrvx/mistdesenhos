@@ -100,11 +100,11 @@ class ArtController extends Controller
     {
         $user = Auth::user();
         
-        // Busca os produtos e serviços DO USUÁRIO LOGADO para ele editar
+        // Busca APENAS os produtos da loja (Arts)
+        // Removemos a busca de 'commissions' pois não existem mais "Tipos de Serviço" fixos
         $arts = Art::where('user_id', $user->id)->latest()->get();
-        $commissions = Commission::where('user_id', $user->id)->get();
 
-        return view('arts.edit_showcase', compact('user', 'arts', 'commissions'));
+        return view('arts.edit_showcase', compact('user', 'arts'));
     }
 
     // 7. Atualizar a Vitrine (Status, Bio, Tags, Social)

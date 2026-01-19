@@ -7,6 +7,7 @@ use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\AdminController; // <--- Importante: O Controller que criamos
 use App\Models\Art;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CommissionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -105,6 +106,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // --- ENCOMENDAS ---
+    Route::get('/encomendas', [CommissionController::class, 'index'])->name('commissions.index');
+    Route::get('/artista/{artist}/encomendar', [CommissionController::class, 'create'])->name('commissions.create');
+    Route::post('/artista/{artist}/encomendar', [CommissionController::class, 'store'])->name('commissions.store');
+    Route::patch('/encomendas/{commission}/status', [CommissionController::class, 'updateStatus'])->name('commissions.update-status');
+    Route::post('/encomendas/{commission}/pagar', [CommissionController::class, 'pay'])->name('commissions.pay');
+
 });
 
 /*

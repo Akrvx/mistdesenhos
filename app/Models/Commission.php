@@ -2,19 +2,31 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Commission extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'title', 'description', 'price', 'days_to_complete', 'is_nsfw'
+        'client_id',
+        'artist_id',
+        'description',
+        'price',
+        'status',
+        'prazo_desejado'
     ];
 
-    public function user()
+    // Relacionamento: Quem pediu
+    public function client()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'client_id');
+    }
+
+    // Relacionamento: Quem faz
+    public function artist()
+    {
+        return $this->belongsTo(User::class, 'artist_id');
     }
 }
