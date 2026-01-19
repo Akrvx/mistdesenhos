@@ -57,4 +57,20 @@ class ProfileController extends Controller
 
         return Redirect::to('/');
     }
+
+    /**
+     * Transforma o usuário em Artista.
+     */
+    public function becomeArtist(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+        
+        // Ativa o modo artista e já abre as encomendas
+        $user->is_artist = true;
+        $user->commissions_open = true; 
+        $user->save();
+
+        return Redirect::route('dashboard')->with('success', 'Parabéns! Agora você é um Artista oficial.');
+    }
+    
 }
