@@ -23,6 +23,7 @@ Route::get('/', function () {
 
 // Perfil Público do Artista
 Route::get('/artista/{user}', [ArtController::class, 'artist'])->name('artist.show');
+Route::patch('/profile/nsfw', [ProfileController::class, 'updateNsfw'])->name('profile.update-nsfw');
 
 // Detalhes da Arte
 Route::get('/art/{art}', [ArtController::class, 'show'])->name('arts.show');

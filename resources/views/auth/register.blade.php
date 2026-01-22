@@ -2,21 +2,28 @@
     <form method="POST" action="{{ route('register') }}">
         @csrf
 
-        <!-- Name -->
         <div>
             <x-input-label for="name" :value="__('Name')" />
             <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
             <x-input-error :messages="$errors->get('name')" class="mt-2" />
         </div>
 
-        <!-- Email Address -->
         <div class="mt-4">
             <x-input-label for="email" :value="__('Email')" />
             <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
-        <!-- Password -->
+        <div class="mt-4">
+            <x-input-label for="birth_date" :value="__('Data de Nascimento')" />
+            <x-text-input id="birth_date" class="block mt-1 w-full cursor-pointer text-slate-300" 
+                          type="date" 
+                          name="birth_date" 
+                          :value="old('birth_date')" 
+                          required />
+            <x-input-error :messages="$errors->get('birth_date')" class="mt-2" />
+        </div>
+
         <div class="mt-4">
             <x-input-label for="password" :value="__('Password')" />
 
@@ -28,7 +35,6 @@
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 
-        <!-- Confirm Password -->
         <div class="mt-4">
             <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
 
@@ -41,8 +47,8 @@
 
         <div class="block mt-4">
             <label for="is_artist" class="inline-flex items-center group cursor-pointer">
-            <input id="is_artist" type="checkbox" name="is_artist" value="1" 
-                class="rounded bg-white/10 border-white/30 text-cyan-500 shadow-sm focus:ring-cyan-500 focus:ring-offset-gray-900 transition cursor-pointer">
+                <input id="is_artist" type="checkbox" name="is_artist" value="1" 
+                    class="rounded bg-white/10 border-white/30 text-cyan-500 shadow-sm focus:ring-cyan-500 focus:ring-offset-gray-900 transition cursor-pointer">
         
                 <span class="ms-2 text-sm text-cyan-100 group-hover:text-white transition">
                     I want to sell my arts on the Lake

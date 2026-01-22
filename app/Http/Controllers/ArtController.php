@@ -27,6 +27,7 @@ class ArtController extends Controller
             'descricao' => 'nullable|string',
             'preco' => 'required|numeric|min:0',
             'imagem' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Max 2MB
+            'is_nsfw' => 'nullable|boolean', // Validação do campo NSFW
         ]);
 
         // Upload da Imagem
@@ -44,6 +45,7 @@ class ArtController extends Controller
             'descricao' => $request->descricao,
             'preco' => $request->preco,
             'imagem_caminho' => $path, 
+            'is_nsfw' => $request->has('is_nsfw'), // Salva se é NSFW
         ]);
 
         // Redireciona para o Dashboard
@@ -53,6 +55,14 @@ class ArtController extends Controller
     // 3. Mostrar Detalhes de UMA Arte (GET /art/{id})
     public function show(Art $art)
     {
+        // Proteção: Se a arte for NSFW e o usuário não puder ver, bloqueia.
+        $user = Auth::user();
+        if ($art->is_nsfw) {
+            if (!$user || $user->age < 18 || !$user->show_nsfw) {
+                abort(403, 'Conteúdo restrito para maiores de 18 anos.');
+            }
+        }
+
         // Carrega o dono da arte para mostrarmos o nome dele
         $art->load('user');
         
@@ -62,8 +72,17 @@ class ArtController extends Controller
     // 4. Vitrine do Artista (GET /artista/{id})
     public function artist(User $user)
     {
-        // Carrega todas as artes desse usuário
-        $arts = $user->arts()->latest()->get();
+        $viewer = Auth::user();
+        
+        // Carrega as artes do artista
+        $query = $user->arts()->latest();
+
+        // --- FILTRO DE SEGURANÇA NSFW (No Perfil) ---
+        if (!$viewer || $viewer->age < 18 || !$viewer->show_nsfw) {
+            $query->where('is_nsfw', false);
+        }
+
+        $arts = $query->get();
         
         return view('arts.artist', compact('user', 'arts'));
     }
@@ -71,8 +90,18 @@ class ArtController extends Controller
     // 5. Função do FEED (Estilo Blog/Timeline)
     public function feed(Request $request)
     {
+        $user = Auth::user();
+
         // 1. Busca as Artes (Filtro)
         $query = Art::with('user');
+
+        // --- FILTRO DE SEGURANÇA NSFW (No Feed) ---
+        // Se NÃO estiver logado, OU se for menor de idade, OU se a opção estiver desligada:
+        // ESCONDE TUDO QUE É NSFW.
+        if (!$user || $user->age < 18 || !$user->show_nsfw) {
+            $query->where('is_nsfw', false);
+        }
+        // ------------------------------------------
 
         if ($request->has('categoria') && $request->categoria != 'todas') {
             $query->where('category', $request->categoria);
@@ -101,7 +130,6 @@ class ArtController extends Controller
         $user = Auth::user();
         
         // Busca APENAS os produtos da loja (Arts)
-        // Removemos a busca de 'commissions' pois não existem mais "Tipos de Serviço" fixos
         $arts = Art::where('user_id', $user->id)->latest()->get();
 
         return view('arts.edit_showcase', compact('user', 'arts'));
@@ -114,8 +142,6 @@ class ArtController extends Controller
 
         // CENÁRIO A: O usuário clicou no botão de STATUS (Aberto/Fechado)
         if ($request->input('form_type') === 'status') {
-            // O checkbox só envia valor se estiver marcado. 
-            // has('commissions_open') retorna true se marcado, false se não.
             $user->commissions_open = $request->has('commissions_open');
             $user->save();
             
@@ -124,7 +150,6 @@ class ArtController extends Controller
         }
 
         // CENÁRIO B: O usuário salvou o PERFIL (Bio, Tags, Social)
-        // (Verificamos se é 'profile' ou se não tem tipo, pra garantir)
         if ($request->input('form_type') === 'profile' || !$request->has('form_type')) {
             $request->validate([
                 'specialties' => 'array',

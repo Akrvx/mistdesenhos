@@ -64,14 +64,31 @@
                                     </span>
                                 </div>
 
-                                <div class="relative group bg-black/20 flex-grow">
-                                    <a href="{{ route('arts.show', $art->id) }}" class="block overflow-hidden h-64">
+                                <div class="relative group bg-black/20 flex-grow overflow-hidden">
+                                    <a href="{{ route('arts.show', $art->id) }}" class="block h-64 relative">
                                         @if(Str::startsWith($art->imagem_caminho, 'fake_demo'))
-                                            <img src="https://picsum.photos/seed/{{ $art->id }}/800/600" class="w-full h-full object-cover transition duration-700 group-hover:scale-105">
+                                            <img id="art-img-{{ $art->id }}" 
+                                                 src="https://picsum.photos/seed/{{ $art->id }}/800/600" 
+                                                 class="w-full h-full object-cover transition duration-700 group-hover:scale-105 {{ $art->is_nsfw ? 'blur-2xl scale-110 brightness-50' : '' }}">
                                         @else
-                                            <img src="{{ asset('storage/' . $art->imagem_caminho) }}" class="w-full h-full object-cover transition duration-700 group-hover:scale-105">
+                                            <img id="art-img-{{ $art->id }}" 
+                                                 src="{{ asset('storage/' . $art->imagem_caminho) }}" 
+                                                 class="w-full h-full object-cover transition duration-700 group-hover:scale-105 {{ $art->is_nsfw ? 'blur-2xl scale-110 brightness-50' : '' }}">
                                         @endif
                                     </a>
+
+                                    @if($art->is_nsfw)
+                                        <div id="nsfw-overlay-{{ $art->id }}" class="absolute inset-0 flex flex-col items-center justify-center bg-black/20 z-10 transition-opacity duration-500">
+                                            <div class="mb-3">
+                                                <span class="text-4xl">🔞</span>
+                                            </div>
+                                            <button onclick="revealArt({{ $art->id }})" 
+                                                    class="bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-6 rounded-full border border-red-400 shadow-[0_0_15px_rgba(220,38,38,0.5)] transition transform hover:scale-105 text-xs uppercase tracking-widest">
+                                                Ver Conteúdo
+                                            </button>
+                                            <p class="text-white/50 text-[10px] mt-2 font-bold uppercase">Conteúdo Sensível</p>
+                                        </div>
+                                    @endif
                                 </div>
 
                                 <div class="p-4">
@@ -159,4 +176,20 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function revealArt(id) {
+            // 1. Remove o Blur da imagem
+            const img = document.getElementById('art-img-' + id);
+            if(img) {
+                img.classList.remove('blur-2xl', 'brightness-50', 'scale-110'); // Removi scale-110 também para voltar ao normal
+            }
+
+            // 2. Esconde o Overlay (botão) com uma transição suave
+            const overlay = document.getElementById('nsfw-overlay-' + id);
+            if(overlay) {
+                overlay.classList.add('opacity-0', 'pointer-events-none');
+            }
+        }
+    </script>
 @endsection

@@ -7,29 +7,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-/**
- * @property int $id
- * @property string $name
- * @property string $email
- * @property float $wallet_balance
- * @property int $reputation
- * @property int $total_sales
- * @property bool $is_admin
- * @property bool $is_artist
- * @property bool $commissions_open
- * @property string|null $bio
- * @property string|null $specialties
- * @property string|null $socials
- * @property \Illuminate\Support\Carbon|null $email_verified_at
- * @property string $password
- * @property string|null $remember_token
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- */
 class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'name',
         'email',
@@ -43,13 +29,26 @@ class User extends Authenticatable
         'specialties',
         'socials',
         'commissions_open',
+        // --- NOVOS CAMPOS PARA IDADE E NSFW ---
+        'birth_date',
+        'show_nsfw',
     ];
 
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var list<string>
+     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
     protected function casts(): array
     {
         return [
@@ -61,24 +60,34 @@ class User extends Authenticatable
             'wallet_balance' => 'decimal:2',
             'specialties' => 'array',
             'socials' => 'array',
+            // --- CASTS DE DATA E BOOLEAN ---
+            'birth_date' => 'date',
+            'show_nsfw' => 'boolean',
         ];
     }
 
-    // --- RELACIONAMENTOS (O que faltava!) ---
+    // --- CÁLCULO DE IDADE (ATRIBUTO VIRTUAL) ---
+    // Permite usar $user->age em qualquer lugar
+    public function getAgeAttribute()
+    {
+        return $this->birth_date ? $this->birth_date->age : 0;
+    }
 
-    // 1. Um Usuário (Artista) tem muitas Artes
+    // --- RELACIONAMENTOS DO MARKETPLACE ---
+
+    // 1. Um Usuário (Artista) tem muitas Artes na vitrine
     public function arts()
     {
         return $this->hasMany(Art::class);
     }
 
-    // 2. Um Usuário (Cliente) faz muitas encomendas
+    // 2. Um Usuário (Cliente) faz muitas encomendas (pedidos)
     public function commissionsAsClient()
     {
         return $this->hasMany(Commission::class, 'client_id');
     }
 
-    // 3. Um Usuário (Artista) recebe muitas encomendas
+    // 3. Um Usuário (Artista) recebe muitas encomendas (serviços)
     public function commissionsAsArtist()
     {
         return $this->hasMany(Commission::class, 'artist_id');

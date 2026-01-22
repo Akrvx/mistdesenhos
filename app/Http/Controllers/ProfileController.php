@@ -72,5 +72,22 @@ class ProfileController extends Controller
 
         return Redirect::route('dashboard')->with('success', 'Parabéns! Agora você é um Artista oficial.');
     }
+
+    public function updateNsfw(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        // SEGURANÇA: Só permite ativar se for maior de 18
+        if ($user->age < 18) {
+            return back()->with('error', 'Ação não permitida para menores de idade.');
+        }
+
+        // Se marcou o checkbox, é true. Se não, é false.
+        $user->show_nsfw = $request->has('show_nsfw');
+        $user->save();
+
+        $status = $user->show_nsfw ? 'Conteúdo NSFW ativado.' : 'Conteúdo NSFW oculto.';
+        return back()->with('success', $status);
+    }
     
 }

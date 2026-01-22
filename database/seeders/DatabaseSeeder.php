@@ -12,39 +12,44 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. CRIA O SEU USUÁRIO (ADMIN)
+        // 1. CRIA O SEU USUÁRIO (ADMIN / ARTISTA)
         User::create([
             'name' => 'Mauricio Developer',
             'email' => 'admin@duckly.com',
             'password' => Hash::make('password'),
             'is_artist' => true,
+            'commissions_open' => true, // Importante para receber pedidos
             'wallet_balance' => 50000,
             'reputation' => 999,
             'total_sales' => 150,
+            'bio' => 'Fundador e Desenvolvedor da Plataforma.',
         ]);
 
-        $this->command->info('Usuário Admin criado: admin@duckly.com / Senha: password');
+        $this->command->info('Admin criado: admin@duckly.com / Senha: password');
 
         // 2. CRIA ARTISTAS FALSOS
         $nomesArtistas = [
-            'Alice Paint', 'Bob Sketch', 'Carol Pixel', 'Dan Canvas', 
-            'Eve Brush', 'Frank Line', 'Grace Palette', 'Hank Ink', 
-            'Ivy Color', 'Jack Draw'
+            'Alice Paint', 'Bob Sketch', 'Carol Pixel', 'Dan Canvas', 'Eve Brush'
         ];
 
-        foreach ($nomesArtistas as $index => $nome) {
-            
+        $artistasIds = [];
+
+        foreach ($nomesArtistas as $nome) {
             $artist = User::create([
                 'name' => $nome,
                 'email' => strtolower(str_replace(' ', '', $nome)) . '@duckly.com',
                 'password' => Hash::make('password'),
                 'is_artist' => true,
+                'commissions_open' => (rand(0, 1) == 1), // Alguns com agenda aberta, outros fechada
                 'wallet_balance' => rand(100, 5000),
                 'reputation' => rand(10, 500),
                 'total_sales' => rand(0, 100),
+                'bio' => 'Artista digital apaixonado por criar mundos fantásticos.',
             ]);
+            
+            $artistasIds[] = $artist->id;
 
-            // 3. CRIA PRODUTOS (SHOP) - CORRIGIDO AQUI
+            // 3. CRIA PRODUTOS (SHOP) PARA CADA ARTISTA
             $categorias = ['Digital', 'Pintura', '3D', 'Fotografia', 'IA', 'Pixel Art'];
             $titulosArts = ['Cyber City', 'Morning Dew', 'Abstract Mind', 'Lost Soul', 'Neon Light', 'Retro Vibe', 'Duck Life'];
 
@@ -52,43 +57,48 @@ class DatabaseSeeder extends Seeder
                 Art::create([
                     'user_id' => $artist->id,
                     'titulo' => $titulosArts[array_rand($titulosArts)] . ' #' . rand(1, 99),
-                    
-                    // CORREÇÃO: Mudamos de 'description' para 'descricao'
-                    'descricao' => 'Uma obra incrível disponível para download imediato. Alta resolução incluída. Arte original criada com muito carinho.',
-                    
-                    'category' => $categorias[array_rand($categorias)],
+                    'descricao' => 'Uma obra incrível disponível para download imediato. Alta resolução incluída.',
                     'preco' => rand(50, 800),
-                    'imagem_caminho' => 'fake_demo_' . $index . '_' . $i . '.jpg', 
+                    'imagem_caminho' => 'fake_demo_' . rand(1,5) . '.jpg', // Nome genérico para não quebrar imagens
                     'is_nsfw' => (rand(1, 100) > 90),
                 ]);
             }
-
-            // 4. CRIA SERVIÇOS (COMMISSIONS)
-            // Nas comissões mantemos 'description' pois a tabela foi criada em inglês
-            $tiposComissao = [
-                ['Icon Sketch', 50, false],
-                ['Full Body Flat', 150, false],
-                ['Full Body Render', 300, false],
-                ['Chibi Cute Style', 80, false],
-                ['Cenário Complexo RPG', 500, false],
-                ['Emotes Twitch (Pack)', 60, false],
-                ['Modelo VTuber Rigged', 1200, false],
-                ['NSFW Hardcore Art', 400, true],
-                ['NSFW Soft / Pinup', 250, true],
-            ];
-
-            for ($j = 0; $j < rand(2, 5); $j++) {
-                $servico = $tiposComissao[array_rand($tiposComissao)];
-                
-                Commission::create([
-                    'user_id' => $artist->id,
-                    'title' => $servico[0],
-                    'description' => 'Faço este serviço com qualidade profissional. Entrega rápida e revisões inclusas.',
-                    'price' => $servico[1],
-                    'days_to_complete' => rand(3, 30),
-                    'is_nsfw' => $servico[2],
-                ]);
-            }
         }
+
+        // 4. CRIA CLIENTES FALSOS (Para fazerem os pedidos)
+        $nomesClientes = ['John Doe', 'Jane Smith', 'Richie Rich', 'Fan Boy'];
+        $clientesIds = [];
+
+        foreach ($nomesClientes as $nome) {
+            $client = User::create([
+                'name' => $nome,
+                'email' => strtolower(str_replace(' ', '', $nome)) . '@client.com',
+                'password' => Hash::make('password'),
+                'is_artist' => false,
+                'wallet_balance' => rand(1000, 10000), // Clientes ricos
+            ]);
+            $clientesIds[] = $client->id;
+        }
+
+        // 5. CRIA PEDIDOS DE ENCOMENDA (COMMISSIONS)
+        // Simula pedidos dos Clientes para os Artistas
+        $statusPossiveis = ['pending', 'accepted', 'active', 'completed', 'rejected'];
+
+        for ($k = 0; $k < 15; $k++) {
+            $status = $statusPossiveis[array_rand($statusPossiveis)];
+            $preco = rand(100, 1500);
+            
+            Commission::create([
+                'client_id' => $clientesIds[array_rand($clientesIds)],
+                'artist_id' => $artistasIds[array_rand($artistasIds)],
+                'description' => 'Gostaria de um desenho do meu personagem de RPG ' . ($k + 1) . '. Detalhes: Elfo, capa verde, espada brilhante.',
+                'status' => $status,
+                'price' => ($status != 'pending') ? $preco : null, // Só tem preço se o artista já viu
+                'prazo_desejado' => now()->addDays(rand(5, 20)),
+                'created_at' => now()->subDays(rand(1, 30)),
+            ]);
+        }
+        
+        $this->command->info('Seed completo! Artistas, Clientes e Pedidos criados.');
     }
 }

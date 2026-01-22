@@ -30,19 +30,24 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-        'name' => ['required', 'string', 'max:255'],
-        'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-        'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        'is_artist' => ['nullable', 'boolean'], // Validação nova
-    ]);
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'is_artist' => ['nullable', 'boolean'],
+            // --- NOVA VALIDAÇÃO ---
+            'birth_date' => ['required', 'date', 'before:today'], // Obrigatório e não pode ser data futura
+        ]);
 
-    $user = User::create([
-        'name' => $request->name,
-        'email' => $request->email,
-        'password' => Hash::make($request->password),
-        // Se o checkbox estiver marcado, salva true. Se não, false.
-        'is_artist' => $request->has('is_artist'), 
-    ]);
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'is_artist' => $request->has('is_artist'),
+            // --- SALVANDO OS NOVOS CAMPOS ---
+            'birth_date' => $request->birth_date,
+            'show_nsfw' => false, // Nasce desativado por segurança
+        ]);
+
         event(new Registered($user));
 
         Auth::login($user);
